@@ -1,11 +1,26 @@
+import importlib
 import json
 import re
+import subprocess
+import sys
 from html import unescape
 
-import feedparser
-import requests
 import streamlit as st
-from groq import Groq
+
+
+def ensure_package(package_name: str, import_name: str | None = None):
+    module_name = import_name or package_name
+    try:
+        return importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+        return importlib.import_module(module_name)
+
+
+feedparser = ensure_package("feedparser")
+requests = ensure_package("requests")
+groq_module = ensure_package("groq")
+Groq = groq_module.Groq
 
 DEFAULT_SYSTEM_PROMPT = """
 أنت KAIROS، عقله الاستراتيجي. هذا النظام ليس أداة نشر فقط، بل سلاح استراتيجي.
